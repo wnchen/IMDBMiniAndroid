@@ -20,16 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" >
-		    
-		    <!--<TextView
-		        android:id="@+id/details"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_marginTop="10dp"
-		        android:textSize="@dimen/search"
-		        android:textAlignment="center"
-		        android:gravity="center"
-		        android:text="@string/detail" />-->
     
 		    <com.android.volley.toolbox.NetworkImageView
 		  	  android:id="@+id/detailImage"
