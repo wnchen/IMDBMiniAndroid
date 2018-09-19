@@ -1,5 +1,6 @@
 package com.wenbchen.android.imdb.activities;
 
+
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -14,14 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.wenbchen.android.imdb.R;
-import com.wenbchen.android.imdb.fragments.TVFragment;
 import com.wenbchen.android.imdb.fragments.MovieFragment;
+import com.wenbchen.android.imdb.fragments.TVFragment;
 
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
-    private NavigationView nvDrawer;
     private ActionBarDrawerToggle drawerToggle;
 
     @Override
@@ -30,16 +30,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //set a Toolbar to replace the ActionBar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //find out drawer view
-        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawer = findViewById(R.id.drawer_layout);
         drawerToggle = setupDrawerToggle();
-        mDrawer.setDrawerListener(drawerToggle);
+        mDrawer.addDrawerListener(drawerToggle);
 
 
-        nvDrawer = (NavigationView) findViewById(R.id.nvView);
+        NavigationView nvDrawer = findViewById(R.id.nvView);
         setupDrawerContent(nvDrawer);
 
         if (savedInstanceState == null) {
@@ -93,10 +93,10 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = null;
         Class fragmentClass;
         switch (menuItem.getItemId()) {
-            case R.id.nav_south_park:
+            case R.id.nav_movie:
                 fragmentClass = MovieFragment.class;
                 break;
-            case R.id.nav_family_guy:
+            case R.id.nav_tv:
                 fragmentClass = TVFragment.class;
                 break;
             default:
@@ -110,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        bindFragment(fragment);
 
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
@@ -121,17 +120,12 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
+    private void bindFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+    }
+
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open, R.string.drawer_close);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 }

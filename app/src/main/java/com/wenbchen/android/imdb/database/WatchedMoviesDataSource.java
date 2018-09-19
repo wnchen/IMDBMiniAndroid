@@ -17,7 +17,7 @@ public class WatchedMoviesDataSource {
 	// Database fields
 	  private SQLiteDatabase database;
 	  private MovieSQLiteHelper dbHelper;
-	  private String[] allColumns = { MovieSQLiteHelper.COLUMN_ID,
+	  private String[] allColumns = { MovieSQLiteHelper.COLUMN_NAME_ID,
 	      MovieSQLiteHelper.COLUMN_IS_WATCHED };
 
 	  public WatchedMoviesDataSource(Context context) {
@@ -33,23 +33,43 @@ public class WatchedMoviesDataSource {
 	  }
 
 	  public void insertMovie(String uuid, int isWatched) {
-	    ContentValues values = new ContentValues();
-	    values.put(MovieSQLiteHelper.COLUMN_ID, uuid);
-	    values.put(MovieSQLiteHelper.COLUMN_IS_WATCHED, isWatched);
-	    long insertId = database.insert(MovieSQLiteHelper.TABLE_WATCHED_MOVIES, null, values);
+	  	boolean isExisted = isExist(uuid);
+	  	if (!isExisted) {
+	  		insert(uuid, isWatched);
+		}
 	  }
 
-	  public void deleteComment(WatchedMovie watchedMovie) {
+	private void insert(String uuid, int isWatched) {
+	  	ContentValues values = new ContentValues();
+	  	values.put(MovieSQLiteHelper.COLUMN_NAME_ID, uuid);
+	  	values.put(MovieSQLiteHelper.COLUMN_IS_WATCHED, isWatched);
+	  	database.insert(MovieSQLiteHelper.TABLE_NAME, null, values);
+	}
+
+	private boolean isExist(String uuid) {
+	  	String[] columns = new String[]{MovieSQLiteHelper.COLUMN_NAME_ID};
+	  	String selection = MovieSQLiteHelper.COLUMN_NAME_ID + " =?";
+	  	String[] selectionArgs = new String[] {uuid};
+	  	String limit = "1";
+	  	Cursor cursor = database.query(true, MovieSQLiteHelper.TABLE_NAME, columns, selection, selectionArgs, null,
+				null, null, limit);
+	  	boolean existed = cursor.getCount() > 0;
+	  	cursor.close();
+	  	return existed;
+
+	}
+
+	public void deleteComment(WatchedMovie watchedMovie) {
 	    long id = watchedMovie.getId();
 	    System.out.println("watchedMovie deleted with uuid: " + id);
-	    database.delete(MovieSQLiteHelper.TABLE_WATCHED_MOVIES, MovieSQLiteHelper.COLUMN_ID
+	    database.delete(MovieSQLiteHelper.TABLE_NAME, MovieSQLiteHelper.COLUMN_NAME_ID
 	        + " = " + id, null);
 	  }
 
 	  public List<WatchedMovie> getAllComments() {
 	    List<WatchedMovie> comments = new ArrayList<WatchedMovie>();
 
-	    Cursor cursor = database.query(MovieSQLiteHelper.TABLE_WATCHED_MOVIES,
+	    Cursor cursor = database.query(MovieSQLiteHelper.TABLE_NAME,
 	        allColumns, null, null, null, null, null);
 
 	    cursor.moveToFirst();

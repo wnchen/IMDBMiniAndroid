@@ -4,7 +4,9 @@ public class UtilsString {
 	public static final String TAG = "UtilsString";
 	
 	//http request urls
-	public static final String BASE_URL = "http://www.omdbapi.com/";
+	public static final String BASE_URL = "https://www.omdbapi.com/";
+
+	public static final String API_KEY = "140cf466";
 	
 	//http request tags
 	public static final String MOVIE_LIST_TAG = "movie_list_tag";

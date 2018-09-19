@@ -1,12 +1,5 @@
 package com.wenbchen.android.imdb.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -25,24 +18,26 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.wenbchen.android.imdb.R;
-import com.wenbchen.android.imdb.adater.CustomListAdapter;
+import com.wenbchen.android.imdb.adater.MovieListAdapter;
 import com.wenbchen.android.imdb.database.WatchedMoviesDataSource;
 import com.wenbchen.android.imdb.model.Media;
 import com.wenbchen.android.imdb.util.UtilsString;
 import com.wenbchen.android.imdb.volleysingleton.VolleySingleton;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class BaseListViewActivity extends AppCompatActivity {
     // Log tag
     private static final String TAG = "BaseListViewActivity";
 
-    // Movies json url
-    private Toolbar toolbar;
-    private StringBuffer mUrlStringBuffer;
     private ProgressDialog pDialog;
     private List<Media> movieList = new ArrayList<Media>();
-    private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
-    private RecyclerView.LayoutManager layoutManager;
     private TextView mNoMoviesTextView;
     private WatchedMoviesDataSource dataSource;
     protected String title;
@@ -58,10 +53,12 @@ public class BaseListViewActivity extends AppCompatActivity {
         setContentView(R.layout.list_view);
 
         //set a Toolbar to replace the ActionBar
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setUpPageTitle();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         Bundle extras = getIntent().getExtras();
         title = extras.getString(UtilsString.TITLE_KEY);
@@ -71,16 +68,16 @@ public class BaseListViewActivity extends AppCompatActivity {
         dataSource.open();
 
         mNoMoviesTextView = (TextView) findViewById(R.id.no_movies);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
 
-        layoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        adapter = new CustomListAdapter(this, movieList, dataSource);
+        adapter = new MovieListAdapter(this, movieList, dataSource);
         recyclerView.setAdapter(adapter);
 
-        mUrlStringBuffer = new StringBuffer();
+        StringBuffer mUrlStringBuffer = new StringBuffer();
         mUrlStringBuffer = buildSearchRequest(title, year);
 
 
@@ -115,7 +112,6 @@ public class BaseListViewActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        // TODO Auto-generated method stub
         super.onStop();
         hidePDialog();
         VolleySingleton.getInstance(this.getApplicationContext()).cancelPendingRequests(UtilsString.MOVIE_LIST_TAG);

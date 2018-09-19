@@ -1,7 +1,13 @@
 package com.wenbchen.android.imdb.activities;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.app.ProgressDialog;
+import android.os.Bundle;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -13,14 +19,10 @@ import com.wenbchen.android.imdb.R;
 import com.wenbchen.android.imdb.util.UtilsString;
 import com.wenbchen.android.imdb.volleysingleton.VolleySingleton;
 
-import android.app.ProgressDialog;
-import android.os.Bundle;
-import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.MenuItem;
-import android.widget.TextView;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import static com.wenbchen.android.imdb.util.UtilsString.API_KEY;
 
 public class MediaDetailBaseActivity extends AppCompatActivity {
     public static final String TAG = "MediaDetailBaseActivity";
@@ -85,6 +87,8 @@ public class MediaDetailBaseActivity extends AppCompatActivity {
         mStringBuffer.append(UtilsString.BASE_URL);
         mStringBuffer.append("?i=");
         mStringBuffer.append(uuid);
+        mStringBuffer.append("&apikey=");
+        mStringBuffer.append(API_KEY);
 
         pDialog = new ProgressDialog(this);
         // Showing progress dialog before making http request
