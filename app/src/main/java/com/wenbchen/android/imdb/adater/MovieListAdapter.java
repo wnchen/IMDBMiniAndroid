@@ -1,8 +1,7 @@
 package com.wenbchen.android.imdb.adater;
 
 
-import android.content.Context;
-import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,9 +15,6 @@ import android.widget.TextView;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.wenbchen.android.imdb.R;
-import com.wenbchen.android.imdb.activities.MovieDetailActivity;
-import com.wenbchen.android.imdb.activities.MovieListViewActivity;
-import com.wenbchen.android.imdb.activities.TVDetailActivity;
 import com.wenbchen.android.imdb.database.WatchedMoviesDataSource;
 import com.wenbchen.android.imdb.model.Media;
 import com.wenbchen.android.imdb.util.UtilsString;
@@ -30,27 +26,30 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 	public static final String TAG = "CustomListAdapter";
 	
 	private AppCompatActivity activity;
-	private LayoutInflater inflater;
 	private List<Media> movieItems;
-	ImageLoader imageLoader;
+	private ImageLoader imageLoader;
 	private WatchedMoviesDataSource dataSource;
+	private Listener listener;
 	
 	public MovieListAdapter(AppCompatActivity activity, List<Media> movieItems, WatchedMoviesDataSource dataSource) {
 		this.activity = activity;
 		this.movieItems = movieItems;
 		this.dataSource = dataSource;
-		inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		imageLoader = VolleySingleton.getInstance(activity.getApplicationContext()).getImageLoader();
 	}
 
-	public static class ViewHolder extends RecyclerView.ViewHolder {
+	public void setOnClickListener(Listener listener) {
+		this.listener = listener;
+	}
+
+	static class ViewHolder extends RecyclerView.ViewHolder {
 		NetworkImageView thumbNail;
 		TextView title;
 		TextView type;
 		TextView year;
 		TextView watched;
 		Button details;
-		public ViewHolder(View view) {
+		ViewHolder(View view) {
 			super(view);
 			this.type = (TextView) view.findViewById(R.id.type);
 			this.thumbNail = (NetworkImageView) view.findViewById(R.id.thumbnail);
@@ -62,15 +61,15 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 	}
 
 
+	@NonNull
 	@Override
-	public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row, parent, false);
-		ViewHolder vh = new ViewHolder(view);
-		return vh;
+		return new ViewHolder(view);
 	}
 
 	@Override
-	public void onBindViewHolder(final ViewHolder holder, int position) {
+	public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
 		Media m = movieItems.get(position);
 		final String uuid = m.getUuid();
 
@@ -98,17 +97,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 		holder.details.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-						dataSource.insertMovie(uuid, 1);
-						Intent intent;
-						if (activity instanceof MovieListViewActivity) {
-							intent = new Intent(activity, MovieDetailActivity.class);
-						} else {
-							intent = new Intent(activity, TVDetailActivity.class);
-						}
-						intent.putExtra(UtilsString.UUID_KEY, uuid);
-						activity.startActivity(intent);
-						holder.watched.setText(activity.getResources().getString(R.string.viewed));
-					}
+				listener.onItemClicked(uuid);
+			}
 		});
 	}
 
@@ -120,6 +110,12 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 	@Override
 	public int getItemCount() {
 		return movieItems.size();
+	}
+
+
+	public interface Listener {
+
+		void onItemClicked(String uuid);
 	}
 
 }

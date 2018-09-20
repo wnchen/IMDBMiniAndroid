@@ -1,6 +1,7 @@
 package com.wenbchen.android.imdb.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -31,13 +32,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseListViewActivity extends AppCompatActivity {
+public class BaseListViewActivity extends AppCompatActivity implements MovieListAdapter.Listener {
     // Log tag
     private static final String TAG = "BaseListViewActivity";
 
     private ProgressDialog pDialog;
     private List<Media> movieList = new ArrayList<Media>();
-    private RecyclerView.Adapter adapter;
+    private MovieListAdapter adapter;
     private TextView mNoMoviesTextView;
     private WatchedMoviesDataSource dataSource;
     protected String title;
@@ -76,8 +77,9 @@ public class BaseListViewActivity extends AppCompatActivity {
 
         adapter = new MovieListAdapter(this, movieList, dataSource);
         recyclerView.setAdapter(adapter);
+        adapter.setOnClickListener(this);
 
-        StringBuffer mUrlStringBuffer = new StringBuffer();
+        StringBuffer mUrlStringBuffer;
         mUrlStringBuffer = buildSearchRequest(title, year);
 
 
@@ -171,5 +173,18 @@ public class BaseListViewActivity extends AppCompatActivity {
             e1.printStackTrace();
             mNoMoviesTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onItemClicked(String uuid) {
+        dataSource.insertMovie(uuid, 1);
+        Intent intent;
+        if (this instanceof MovieListViewActivity) {
+            intent = new Intent(this, MovieDetailActivity.class);
+        } else {
+            intent = new Intent(this, TVDetailActivity.class);
+        }
+        intent.putExtra(UtilsString.UUID_KEY, uuid);
+        this.startActivity(intent);
     }
 }
